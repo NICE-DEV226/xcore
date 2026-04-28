@@ -9,6 +9,7 @@ readme = "README.md"
 homepage = "https://traoreera.github.io/xcore/"
 repository = "https://github.com/NICE-DEV226/xcore"
 documentation = "https://traoreera.github.io/xcore/"
+packages = [{include = "xcore"}]
 keywords = ["plugin", "framework", "fastapi", "orchestration", "sandbox", "marketplace"]
 classifiers = [
     "Development Status :: 4 - Beta",
