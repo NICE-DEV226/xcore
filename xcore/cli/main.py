@@ -165,6 +165,26 @@ def main() -> None:
     mkt_rate.add_argument("--score", type=int,
                           choices=range(1, 6), required=True)
 
+    # ── hub ───────────────────────────────────────────────────
+    hub_p = subparsers.add_parser("hub", help="Publication sur marketplace.xcore.dev")
+    hub_sub = hub_p.add_subparsers(dest="subcommand")
+
+    hub_sign_p = hub_sub.add_parser("sign", help="Signe le plugin (identité développeur Ed25519)")
+    hub_sign_p.add_argument("path", nargs="?", default=".", help="Répertoire du plugin (défaut: .)")
+    hub_sign_p.add_argument("--hub-url", default=None, dest="hub_url")
+
+    hub_submit_p = hub_sub.add_parser("submit", help="Soumet le plugin au pipeline de validation")
+    hub_submit_p.add_argument("path", nargs="?", default=".", help="Répertoire du plugin (défaut: .)")
+    hub_submit_p.add_argument("--hub-url", default=None, dest="hub_url")
+
+    hub_status_p = hub_sub.add_parser("status", help="Progression de la soumission (7 gates)")
+    hub_status_p.add_argument("id", help="ID de soumission")
+    hub_status_p.add_argument("--hub-url", default=None, dest="hub_url")
+
+    hub_publish_p = hub_sub.add_parser("publish", help="Publie le plugin approuvé")
+    hub_publish_p.add_argument("id", help="ID de soumission approuvée")
+    hub_publish_p.add_argument("--hub-url", default=None, dest="hub_url")
+
     # ── services ──────────────────────────────────────────────
     svc_p = subparsers.add_parser("services", help="État des services")
     svc_sub = svc_p.add_subparsers(dest="subcommand")
@@ -197,6 +217,11 @@ def main() -> None:
         from .marketplace_cmd import handle_marketplace
 
         asyncio.run(handle_marketplace(args))
+
+    elif args.command == "hub":
+        from .hub_cmd import handle_hub
+
+        asyncio.run(handle_hub(args))
 
     elif args.command == "services":
         from .plugin_cmd import handle_services
