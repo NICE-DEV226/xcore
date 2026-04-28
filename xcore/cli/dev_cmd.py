@@ -41,7 +41,7 @@ def _load_config(args):
 
 
 def _hub_url(args, cfg) -> str:
-    raw = getattr(args, "hub_url", None) or cfg.raw.get("marketplace", {}).get("url") or DEFAULT_HUB
+    raw = getattr(args, "hub_url", None) or cfg.marketplace.url
     url = raw.rstrip("/")
     scheme = urlparse(url).scheme
     if scheme not in ("http", "https"):
@@ -72,17 +72,17 @@ def _api_headers(auth: dict) -> dict:
 
 
 async def _dev_validate(args) -> None:
-    from xcore.kernel.security.validation import ManifestValidator
+    from xcore.cli.validate_cmd import validate_full
 
     path = Path(getattr(args, "path", ".")).resolve()
     if not path.exists():
         console.print(f"[red]Dossier introuvable : {path}[/]")
         sys.exit(1)
-    try:
-        manifest = ManifestValidator().load_and_validate(path)
-        console.print(f"[green]✅ Manifeste valide[/] — {manifest.name} v{manifest.version} [{manifest.execution_mode.value}]")
-    except Exception as e:
-        console.print(f"[red]❌ Manifeste invalide : {e}[/]")
+
+    key    = (getattr(args, "key", None) or "").encode()
+    strict = getattr(args, "strict", False)
+    ok = validate_full(str(path), secret_key=key, strict=strict)
+    if not ok:
         sys.exit(1)
 
 

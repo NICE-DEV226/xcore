@@ -57,6 +57,8 @@ def main() -> None:
 
     dev_val = dev_sub.add_parser("validate", help="Valide le manifeste et scanne l'AST")
     dev_val.add_argument("path", nargs="?", default=".", help="Répertoire du plugin (défaut: .)")
+    dev_val.add_argument("--key", default=None, help="Clé HMAC pour vérification signature (optionnel)")
+    dev_val.add_argument("--strict", action="store_true", help="Échec si signature absente")
 
     dev_sign = dev_sub.add_parser("sign", help="Signe le plugin (HMAC + Ed25519)")
     dev_sign.add_argument("path", nargs="?", default=".", help="Répertoire du plugin (défaut: .)")
