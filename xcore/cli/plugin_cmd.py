@@ -51,24 +51,19 @@ def _load_config(args):
 async def handle_plugin(args) -> None:
     sub = getattr(args, "subcommand", None)
     dispatch = {
-        "list": _plugin_list,
-        "health": _plugin_health,
-        "load": _plugin_load,
-        "reload": _plugin_reload,
+        "list":    _plugin_list,
+        "health":  _plugin_health,
+        "load":    _plugin_load,
+        "reload":  _plugin_reload,
         "install": _plugin_install,
-        "remove": _plugin_remove,
-        "info": _plugin_info,
-        "sign": _plugin_sign,
-        "verify": _plugin_verify,
-        "validate": _plugin_validate,
+        "remove":  _plugin_remove,
+        "info":    _plugin_info,
     }
     handler = dispatch.get(sub)
     if handler:
         await handler(args)
     else:
-        print(
-            "Usage : xcore plugin <list|health|install|remove|info|load|reload|sign|verify|validate>"
-        )
+        print("Usage : xcore plugin <list|install|remove|info|load|reload|health>")
 
 
 # ── list ──────────────────────────────────────────────────────
@@ -456,53 +451,6 @@ async def _plugin_info(args) -> None:
     title = f"[bold green]🔌 {escape(manifest.name)} v{escape(manifest.version)}[/]"
     console.print(Panel(content, title=title,
                   expand=False, border_style="cyan"))
-
-
-# ── sign / verify / validate ──────────────────────────────────
-
-
-async def _plugin_validate(args) -> None:
-    from xcore.kernel.security.validation import ManifestValidator
-
-    path = Path(args.path)
-    if not path.exists():
-        console.print(f"[bold red]❌ Erreur :[/] Dossier introuvable : {path}")
-        sys.exit(1)
-    try:
-        v = ManifestValidator()
-        manifest = v.load_and_validate(path)
-        console.print(
-            f"✅  Manifeste valide : {manifest.name} v{manifest.version} [{manifest.execution_mode.value}]"
-        )
-    except Exception as e:
-        console.print(f"[bold red]❌ Manifeste invalide :[/] {e}")
-        sys.exit(1)
-
-
-async def _plugin_sign(args) -> None:
-    from xcore.kernel.security.signature import sign_plugin
-    from xcore.kernel.security.validation import ManifestValidator
-
-    path = Path(args.path)
-    key = (args.key or "change-me").encode()
-    manifest = ManifestValidator().load_and_validate(path)
-    sig = sign_plugin(manifest, key)
-    print(f"✅  Signé : {sig}")
-
-
-async def _plugin_verify(args) -> None:
-    from xcore.kernel.security.signature import SignatureError, verify_plugin
-    from xcore.kernel.security.validation import ManifestValidator
-
-    path = Path(args.path)
-    key = (args.key or "change-me").encode()
-    manifest = ManifestValidator().load_and_validate(path)
-    try:
-        verify_plugin(manifest, key)
-        console.print(f"✅  Signature valide : {manifest.name}")
-    except SignatureError as e:
-        console.print(f"[bold red]❌ Erreur de signature :[/] {e}")
-        sys.exit(1)
 
 
 async def _plugin_load(args) -> None:
